@@ -82,3 +82,71 @@
   }
 }
 ```
+
+### User Profile
+
+**Endpoint:** `/user/profile`
+
+**Method:** `GET`
+
+**Description:** This endpoint is used to get the profile of the logged-in user.
+
+**Headers:**
+
+- `Authorization` (string, required): The JWT token of the logged-in user.
+
+**Response:**
+
+- `200 OK`: User profile data.
+- `401 Unauthorized`: Invalid or missing token.
+
+**Example Request:**
+
+```http
+GET /user/profile HTTP/1.1
+Authorization: Bearer jwt_token_here
+```
+
+**Example Response:**
+
+```json
+{
+  "fullName": {
+    "firstName": "John",
+    "lastName": "Doe"
+  },
+  "email": "user@example.com"
+}
+```
+
+### User Logout
+
+**Endpoint:** `/user/logout`
+
+**Method:** `GET`
+
+**Description:** This endpoint is used to log out the user.
+
+**Headers:**
+
+- `Authorization` (string, required): The JWT token of the logged-in user.
+
+**Response:**
+
+- `200 OK`: User successfully logged out.
+- `401 Unauthorized`: Invalid or missing token.
+
+**Example Request:**
+
+```http
+GET /user/logout HTTP/1.1
+Authorization: Bearer jwt_token_here
+```
+
+**Example Response:**
+
+```json
+{
+  "msg": "logout Successfully"
+}
+```

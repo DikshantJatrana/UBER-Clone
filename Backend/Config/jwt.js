@@ -3,7 +3,7 @@ const Secret = process.env.JWT_SECRET;
 
 function setUser(user) {
   const plainTxt = { id: user._id, email: user.email };
-  return jwt.sign(plainTxt, Secret);
+  return jwt.sign(plainTxt, Secret, { expiresIn: "24h" });
 }
 
 function getUser(token) {
