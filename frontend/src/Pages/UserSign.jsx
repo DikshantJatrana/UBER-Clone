@@ -1,14 +1,17 @@
-import React, { useState } from "react";
+import React, { useContext, useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
+import axios from "axios";
+import { useUserContext } from "../Context/UserContext";
 
 function UserSign() {
+  const navigate = useNavigate();
   const [firstName, setFirstname] = useState("");
   const [lastName, setLastname] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [user, setUser] = useState("");
-
-  const handleSubmit = (e) => {
+  const [userData, setUserData] = useState("");
+  const { user, setUser } = useUserContext();
+  const handleSubmit = async (e) => {
     e.preventDefault();
     const currentUser = {
       fullName: {
@@ -18,15 +21,21 @@ function UserSign() {
       email: email,
       password: password,
     };
-    setUser(currentUser);
-    console.log(user);
+    const response = await axios.post(
+      `${import.meta.env.VITE_BASE_URL}/user/register`,
+      currentUser
+    );
+    if (response.status == 200) {
+      const data = response.data;
+      setUser(data.user);
+      localStorage.setItem("token", data.token);
+      navigate("/home");
+    }
     setEmail("");
     setPassword("");
     setFirstname("");
     setLastname("");
   };
-
-  const Navigate = useNavigate();
   return (
     <div className="w-full h-screen flex items-center justify-center">
       <div className="w-full h-screen max-w-md bg-white flex flex-col justify-between rounded-lg p-8">
@@ -110,12 +119,12 @@ function UserSign() {
               type="submit"
               className="bg-black mt-[3%] text-xl font-bold rounded w-full py-3 text-white mb-3 relative"
             >
-              Register
+              Create Account
             </button>
           </form>
           <div className="mt-6 text-center text-sm text-gray-600">
             Already have an account?{" "}
-            <Link to={"/user/login"} className="text-blue-500 hover:underline">
+            <Link to={"/login"} className="text-blue-500 hover:underline">
               login to account
             </Link>
           </div>

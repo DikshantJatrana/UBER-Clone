@@ -1,8 +1,12 @@
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { FaArrowRight } from "react-icons/fa";
+import axios from "axios";
+import { useCaptainContext } from "../Context/CaptainContext";
 
 function CaptainSign() {
+  const navigate = useNavigate();
+  const { captain, setCaptain } = useCaptainContext();
   const [firstName, setFirstname] = useState("");
   const [lastName, setLastname] = useState("");
   const [email, setEmail] = useState("");
@@ -12,11 +16,10 @@ function CaptainSign() {
   const [plate, setPlate] = useState("");
   const [capacity, setCapacity] = useState("");
   const [type, setType] = useState("");
-  const [user, setUser] = useState("");
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    const currentUser = {
+    const currentCaptain = {
       fullName: {
         firstName: firstName,
         lastName: lastName,
@@ -31,8 +34,16 @@ function CaptainSign() {
         type: type,
       },
     };
-    setUser(currentUser);
-    console.log(user);
+    const response = await axios.post(
+      `${import.meta.env.VITE_BASE_URL}/captain/register`,
+      currentCaptain
+    );
+    if (response.status == 200) {
+      const data = response.data;
+      setCaptain(data.captain);
+      localStorage.setItem("token", data.token);
+      navigate("/captain-login");
+    }
     setEmail("");
     setPassword("");
     setFirstname("");
@@ -44,7 +55,6 @@ function CaptainSign() {
     setType("");
   };
 
-  const Navigate = useNavigate();
   return (
     <div className="w-full h-screen flex items-center justify-center">
       <div className="w-full h-screen max-w-md bg-white flex flex-col justify-between rounded-lg p-8">
@@ -218,7 +228,7 @@ function CaptainSign() {
           <div className="mt-6 text-center text-sm text-gray-600">
             Already have an captain account?{" "}
             <Link
-              to={"/captain/login"}
+              to={"/captain-login"}
               className="text-blue-500 hover:underline"
             >
               login as Captain

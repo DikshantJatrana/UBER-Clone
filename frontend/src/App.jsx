@@ -6,15 +6,36 @@ import UserSign from "./Pages/UserSign";
 import UserLogin from "./Pages/UserLogin";
 import CaptainSign from "./Pages/CaptainSign";
 import CaptainLogin from "./Pages/CaptainLogin";
+import Start from "./Pages/Start";
+import UserWrapper from "./Components/UserWrapper";
+import UserLogout from "./Pages/UserLogout";
+import CaptainLogout from "./Pages/CaptainLogout";
 
 function App() {
   return (
     <Routes>
-      <Route path="/" element={<Home />} />
-      <Route path="/user/register" element={<UserSign />} />
-      <Route path="/user/login" element={<UserLogin />} />
-      <Route path="/captain/register" element={<CaptainSign />} />
-      <Route path="/captain/login" element={<CaptainLogin />} />
+      <Route path="/" element={<Start />} />
+      <Route
+        path="/home"
+        element={
+          <UserWrapper>
+            <Home />
+          </UserWrapper>
+        }
+      />
+      <Route path="/register" element={<UserSign />} />
+      <Route path="/login" element={<UserLogin />} />
+      <Route path="/captain-register" element={<CaptainSign />} />
+      <Route path="/captain-login" element={<CaptainLogin />} />
+      <Route
+        path="/user/logout"
+        element={
+          <UserWrapper>
+            <UserLogout />
+          </UserWrapper>
+        }
+      />
+      <Route path="/captain/logout" element={<CaptainLogout />} />
     </Routes>
   );
 }

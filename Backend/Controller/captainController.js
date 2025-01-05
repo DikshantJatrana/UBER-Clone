@@ -62,8 +62,10 @@ const handleCaptainProfile = async (req, res, next) => {
 const handleCaptainLogout = async (req, res, next) => {
   res.clearCookie("token");
   const token = req.cookies?.token || req.headers?.authorization?.split(" ")[1];
-  await BlackListedTokenModel.create({ token });
-  res.status(200).json({ msg: "captain successfull logout" });
+  if (token) {
+    await BlackListedTokenModel.create({ token });
+  }
+  res.status(200).json({ msg: "logout Successfully" });
 };
 
 module.exports = {

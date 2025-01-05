@@ -1,25 +1,34 @@
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { FaArrowRight } from "react-icons/fa";
+import axios from "axios";
+import { useCaptainContext } from "../Context/CaptainContext";
 
 function CaptainLogin() {
+  const navigate = useNavigate();
+  const { captain, setCaptain } = useCaptainContext();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [captain, setCaptain] = useState("");
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    const currentUser = {
+    const currentCaptain = {
       email: email,
       password: password,
     };
-    setCaptain(currentUser);
-    console.log(captain);
+    const response = await axios.post(
+      `${import.meta.env.VITE_BASE_URL}/captain/login`,
+      currentCaptain
+    );
+    if (response.status === 200) {
+      const data = response.data;
+      setCaptain(data);
+      localStorage.setItem("token", data.token);
+      navigate("/home");
+    }
     setEmail("");
     setPassword("");
   };
-
-  const Navigate = useNavigate();
   return (
     <div className="w-full h-screen flex items-center justify-center">
       <div className="w-full h-screen max-w-md bg-white flex flex-col justify-between rounded-lg p-8">
@@ -79,7 +88,7 @@ function CaptainLogin() {
           <div className="mt-6 text-center text-sm text-gray-600">
             Join in as captain?{" "}
             <Link
-              to={"/captain/register"}
+              to={"/captain-register"}
               className="text-blue-500 hover:underline"
             >
               Create new Account
@@ -89,7 +98,7 @@ function CaptainLogin() {
         <button
           type="button"
           onClick={() => {
-            Navigate("/user/login");
+            navigate("/login");
           }}
           className="bg-[#F5C25B] text-xl font-bold rounded w-full py-3 text-white mb-3 relative"
         >

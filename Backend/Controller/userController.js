@@ -55,10 +55,18 @@ const getUserProfile = async (req, res, next) => {
 };
 
 const logoutUser = async (req, res, next) => {
-  res.clearCookie("token");
   const token = req.cookies?.token || req.headers?.authorization?.split(" ")[1];
-  await BlackListedTokenModel.create({ token });
-  res.status(200).json({ msg: "logout Successfully" });
+  res.clearCookie("token");
+  if (!token) {
+    return res.status(200).json({ msg: "Logged out successfully" });
+  }
+  const isBlackListed = await BlackListedTokenModel.findOne({ token });
+  if (!isBlackListed) {
+    await BlackListedTokenModel.create({ token });
+    return res.status(200).json({ msg: "Logged out successfully" });
+  } else {
+    return res.status(401).json({ msg: "Unauthorized: Token is blacklisted" });
+  }
 };
 
 module.exports = {

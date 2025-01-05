@@ -1,24 +1,33 @@
 import React, { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
+import axios from "axios";
+import { useUserContext } from "../Context/UserContext";
 
 function UserLogin() {
+  const navigate = useNavigate();
+  const { user, setUser } = useUserContext();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [user, setUser] = useState("");
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     const currentUser = {
       email: email,
       password: password,
     };
-    setUser(currentUser);
-    console.log(user);
+    const response = await axios.post(
+      `${import.meta.env.VITE_BASE_URL}/user/login`,
+      currentUser
+    );
+    if (response.status == 200) {
+      const data = response.data;
+      setUser(data.user);
+      localStorage.setItem("token", data.token);
+      navigate("/home");
+    }
     setEmail("");
     setPassword("");
   };
-
-  const Navigate = useNavigate();
   return (
     <div className="w-full h-screen flex items-center justify-center">
       <div className="w-full h-screen max-w-md bg-white flex flex-col justify-between rounded-lg p-8">
@@ -74,10 +83,7 @@ function UserLogin() {
           </form>
           <div className="mt-6 text-center text-sm text-gray-600">
             New here?{" "}
-            <Link
-              to={"/user/register"}
-              className="text-blue-500 hover:underline"
-            >
+            <Link to={"/register"} className="text-blue-500 hover:underline">
               Create new Account
             </Link>
           </div>
@@ -85,7 +91,7 @@ function UserLogin() {
         <button
           type="button"
           onClick={() => {
-            Navigate("/captain/login");
+            navigate("/captain-login");
           }}
           className="bg-[#3B864E] text-xl font-bold rounded w-full py-3 text-white mb-3 relative"
         >
