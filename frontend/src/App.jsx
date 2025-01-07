@@ -10,6 +10,9 @@ import Start from "./Pages/Start";
 import UserWrapper from "./Components/UserWrapper";
 import UserLogout from "./Pages/UserLogout";
 import CaptainLogout from "./Pages/CaptainLogout";
+import CaptainHome from "./Pages/CaptainHome";
+import CaptainWrapper from "./Components/CaptainWrapper";
+import Riding from "./Pages/Riding";
 
 function App() {
   return (
@@ -23,6 +26,7 @@ function App() {
           </UserWrapper>
         }
       />
+      <Route path="/riding" element={<Riding />} />
       <Route path="/register" element={<UserSign />} />
       <Route path="/login" element={<UserLogin />} />
       <Route path="/captain-register" element={<CaptainSign />} />
@@ -36,6 +40,14 @@ function App() {
         }
       />
       <Route path="/captain/logout" element={<CaptainLogout />} />
+      <Route
+        path="/captain-Home"
+        element={
+          <CaptainWrapper>
+            <CaptainHome />
+          </CaptainWrapper>
+        }
+      />
     </Routes>
   );
 }

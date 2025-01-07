@@ -19,7 +19,7 @@ function CaptainLogout() {
       });
 
       localStorage.removeItem("token");
-      navigate("/login");
+      navigate("/captain-login");
     };
 
     logout();

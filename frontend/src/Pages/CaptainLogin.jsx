@@ -24,7 +24,7 @@ function CaptainLogin() {
       const data = response.data;
       setCaptain(data);
       localStorage.setItem("token", data.token);
-      navigate("/home");
+      navigate("/captain-Home");
     }
     setEmail("");
     setPassword("");
