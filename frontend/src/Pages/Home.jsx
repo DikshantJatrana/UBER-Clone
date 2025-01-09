@@ -2,7 +2,6 @@ import React, { useRef, useState } from "react";
 import { RiArrowDownWideFill } from "react-icons/ri";
 import { useGSAP } from "@gsap/react";
 import { gsap } from "gsap";
-import { set } from "mongoose";
 import LocationList from "../Components/LocationSelection";
 import VehicleSelection from "../Components/VehicleSelection";
 import ConfirmedVehicle from "../Components/ConfirmedVehicle";
