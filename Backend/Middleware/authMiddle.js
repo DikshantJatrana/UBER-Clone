@@ -4,7 +4,6 @@ const blackListedModel = require("../Models/blackListedModel");
 const CaptainModel = require("../Models/captainModel");
 
 const Authuser = async (req, res, next) => {
-  console.log("authuser check 1st time");
   try {
     const token =
       req.cookies?.token || req.headers?.authorization?.split(" ")[1];
