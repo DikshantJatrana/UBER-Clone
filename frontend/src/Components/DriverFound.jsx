@@ -2,7 +2,7 @@ import React from "react";
 import { FaLocationDot } from "react-icons/fa6";
 import { HiCash } from "react-icons/hi";
 
-const DriverFound = ({ setDriverFound }) => {
+const DriverFound = ({ ride, setDriverFound }) => {
   return (
     <div className="flex flex-col items-center rounded-t-xl bg-white w-full py-6">
       <div className="w-full px-6 mt-4">
@@ -17,13 +17,15 @@ const DriverFound = ({ setDriverFound }) => {
           />
           <div className="flex items-center">
             <div className="text-right">
-              <p className="font-bold text-gray-800">SANTH</p>
+              <p className="font-bold capitalize text-gray-800">
+                {ride?.captain?.fullName?.firstName +
+                  " " +
+                  ride?.captain?.fullName?.lastName}
+              </p>
               <p className="text-lg font-semibold -my-1  text-gray-900">
-                KA15AK00
+                {ride?.captain?.vehicle?.plate}
               </p>
-              <p className="text-sm text-gray-600">
-                <span className="text-yellow-500">★</span> 4.9
-              </p>
+              <p className="text-sm text-gray-600">{ride?.otp}</p>
             </div>
           </div>
         </div>
@@ -32,28 +34,23 @@ const DriverFound = ({ setDriverFound }) => {
         <div className="flex items-start mb-4 border-b-2 p-2">
           <FaLocationDot className="text-xl text-black mt-1" />
           <div className="ml-4">
-            <h3 className="text-sm font-semibold text-gray-900">562/11-A</h3>
-            <p className="text-sm text-gray-500">
-              Kaikondrahalli, Bengaluru, Karnataka
-            </p>
+            <h3 className="text-sm font-semibold text-gray-900">
+              {ride?.pickup}
+            </h3>
           </div>
         </div>
         <div className="flex items-start mb-4 border-b-2 p-2">
           <div className="w-4 h-4 bg-black rounded-sm mt-1"></div>
           <div className="ml-4">
             <h3 className="text-sm font-semibold text-gray-900">
-              Third Wave Coffee
+              {ride?.destination}
             </h3>
-            <p className="text-sm text-gray-500">
-              17th Cross Rd, PWD Quarters, 1st Sector, HSR Layout, Bengaluru,
-              Karnataka
-            </p>
           </div>
         </div>
         <div className="flex items-start mt-4 border-b-2 p-2">
           <HiCash className="text-xl text-black mt-1" />
           <div className="ml-4">
-            <p className="text-sm text-gray-900 font-bold">₹193.20</p>
+            <p className="text-sm text-gray-900 font-bold">₹{ride?.fare}</p>
             <p className="text-sm text-gray-500">Cash</p>
           </div>
         </div>

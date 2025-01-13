@@ -34,9 +34,13 @@
   },
   "password": "password123"
 }
+```
 
+**Example Response:**
+
+```json
 {
-  "message": "user successfully created"
+  "message": "User successfully created"
 }
 ```
 
@@ -147,7 +151,7 @@ Authorization: Bearer jwt_token_here
 
 ```json
 {
-  "msg": "logout Successfully"
+  "msg": "Logout successfully"
 }
 ```
 
@@ -183,9 +187,13 @@ Authorization: Bearer jwt_token_here
   },
   "password": "password123"
 }
+```
 
+**Example Response:**
+
+```json
 {
-  "message": "captain successfully created"
+  "message": "Captain successfully created"
 }
 ```
 
@@ -296,6 +304,74 @@ Authorization: Bearer jwt_token_here
 
 ```json
 {
-  "msg": "logout Successfully"
+  "msg": "Logout successfully"
+}
+```
+
+### Captain Location Update
+
+**Endpoint:** `/captain/location`
+
+**Method:** `POST`
+
+**Description:** This endpoint is used by the captain to update their current location.
+
+**Request Body:**
+
+- `lat` (number, required): The latitude of the captain's current location.
+- `lng` (number, required): The longitude of the captain's current location.
+
+**Headers:**
+
+- `Authorization` (string, required): The JWT token of the logged-in captain.
+
+**Response:**
+
+- `200 OK`: Location successfully updated.
+- `400 Bad Request`: Invalid details or validation errors. The response contains an array of error messages.
+- `401 Unauthorized`: Invalid or missing token.
+
+**Example Request:**
+
+```json
+{
+  "lat": 37.7749,
+  "lng": -122.4194
+}
+```
+
+**Example Response:**
+
+```json
+{
+  "message": "Location successfully updated"
+}
+```
+
+### Get Captain Location
+
+**Endpoint:** `/api/captain-location`
+
+**Method:** `GET`
+
+**Description:** This endpoint is used to get the current location of the captain.
+
+**Response:**
+
+- `200 OK`: Current location data of the captain.
+- `404 Not Found`: Captain location not found.
+
+**Example Request:**
+
+```http
+GET /api/captain-location HTTP/1.1
+```
+
+**Example Response:**
+
+```json
+{
+  "lat": 37.7749,
+  "lng": -122.4194
 }
 ```

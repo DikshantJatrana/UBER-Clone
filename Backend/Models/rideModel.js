@@ -21,17 +21,17 @@ const rideSchema = new mongoose.Schema({
   },
   captain: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: "captain",
+    ref: "Captain",
   },
   fare: {
     type: Number,
     required: true,
   },
   duration: {
-    type: Number,
+    type: String,
   },
   distance: {
-    type: Number,
+    type: String,
   },
   paymentID: {
     type: String,

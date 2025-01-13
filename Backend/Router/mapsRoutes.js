@@ -25,7 +25,12 @@ router.get(
 
 router.get(
   "/get-suggestions",
-  query("input").isString().isLength({ min: 3 }),
+  [
+    query("input")
+      .isString()
+      .isLength({ min: 1 })
+      .withMessage("Input is required and must be at least 1 character"),
+  ],
   Authuser,
   getAutoSuggestions
 );

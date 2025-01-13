@@ -1,15 +1,21 @@
 import React from "react";
 import { FaUserCircle } from "react-icons/fa";
 import { FaClock, FaRupeeSign } from "react-icons/fa";
+import { useCaptainContext } from "../Context/CaptainContext";
 
 function CaptainDetails() {
+  const { captain, setCaptain } = useCaptainContext();
   return (
     <div className="flex bg-white flex-col p-6">
       <div className="flex items-center justify-between">
         <div className="flex text-3xl items-center">
           <FaUserCircle />
           <div>
-            <p className="font-bold ml-2 text-lg text-gray-800">Harsh Patel</p>
+            <p className="font-bold ml-2 text-lg capitalize text-gray-800">
+              {captain?.fullName?.firstName +
+                " " +
+                captain?.fullName?.lastName || "Captain"}
+            </p>
           </div>
         </div>
         <div>

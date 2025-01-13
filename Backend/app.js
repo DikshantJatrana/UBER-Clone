@@ -11,7 +11,7 @@ const rideRoutes = require("./Router/rideRoutes");
 const app = express();
 connectToDatabase();
 
-app.use(cors());
+app.use(cors({ origin: "*" }));
 app.use(cookieParser());
 app.use(express.json());
 app.use("/user", userRouter);

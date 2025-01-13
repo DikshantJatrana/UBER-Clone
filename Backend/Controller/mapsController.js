@@ -1,5 +1,6 @@
 const axios = require("axios");
 const { validationResult } = require("express-validator");
+const CaptainModel = require("../Models/captainModel");
 
 const getDistanceAndTime = async (origin, destination) => {
   const apiKey = process.env.GO_MAP_API;
@@ -36,11 +37,31 @@ const getDistanceAndTime = async (origin, destination) => {
   }
 };
 
+const getcaptainInRadius = async (latitude, longitude, radiusInKm) => {
+  console.log("Latitude:", latitude);
+  console.log("Longitude:", longitude);
+  console.log("Radius in KM:", radiusInKm);
+
+  try {
+    const captains = await CaptainModel.find({
+      location: {
+        $geoWithin: {
+          $centerSphere: [[longitude, latitude], radiusInKm / 6371],
+        },
+      },
+    });
+    return captains;
+  } catch (error) {
+    console.error("Error in getcaptainInRadius:", error.message);
+    throw new Error("Could not fetch captains in radius");
+  }
+};
+
 const getAddressCoordinateGoMaps = async (req, res, next) => {
   const { address } = req.query;
-  const error = validationResult(req);
-  if (!error.isEmpty()) {
-    return res.status(400).json({ errors: error.array() });
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    return res.status(400).json({ errors: errors.array() });
   }
 
   const apiKey = process.env.GO_MAP_API;
@@ -74,6 +95,36 @@ const getAddressCoordinateGoMaps = async (req, res, next) => {
     return res.status(500).json({
       error: "An error occurred while fetching coordinates",
     });
+  }
+};
+
+const getCoordinatesFromAddress = async (address) => {
+  const apiKey = process.env.GO_MAP_API;
+  if (!apiKey) {
+    throw new Error("API key is missing");
+  }
+  const url = `https://maps.gomaps.pro/maps/api/geocode/json?key=${apiKey}&address=${encodeURIComponent(
+    address
+  )}`;
+
+  try {
+    const response = await axios.get(url);
+    if (response.data.status === "OK") {
+      const location = response.data.results[0].geometry.location;
+      return {
+        location,
+      };
+    } else {
+      throw new Error(
+        response.data.error_message || "Failed to fetch coordinates"
+      );
+    }
+  } catch (error) {
+    throw new Error(
+      error.response?.data?.error_message ||
+        error.message ||
+        "An error occurred while fetching coordinates"
+    );
   }
 };
 
@@ -164,4 +215,6 @@ module.exports = {
   getDistance,
   getAutoSuggestions,
   getDistanceAndTime,
+  getcaptainInRadius,
+  getCoordinatesFromAddress,
 };

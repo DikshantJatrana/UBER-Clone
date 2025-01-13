@@ -1,4 +1,4 @@
-import React, { useRef, useState } from "react";
+import React, { useRef, useState, useEffect } from "react";
 import { RiArrowDownWideFill } from "react-icons/ri";
 import { useGSAP } from "@gsap/react";
 import { gsap } from "gsap";
@@ -6,19 +6,49 @@ import LocationList from "../Components/LocationSelection";
 import VehicleSelection from "../Components/VehicleSelection";
 import ConfirmedVehicle from "../Components/ConfirmedVehicle";
 import DriverFound from "../Components/DriverFound";
+import axios from "axios";
+import { useSocket } from "../Context/SocketContext";
+import { useUserContext } from "../Context/UserContext";
+import { useNavigate } from "react-router-dom";
+import LiveTracking from "../Components/LiveTracking";
 
 function Home() {
-  const [pickup, setPickup] = useState();
-  const [destination, setDestination] = useState();
+  const navigate = useNavigate();
+  const { user } = useUserContext();
+  const { sendMessage, receiveMessage } = useSocket();
+  const [pickup, setPickup] = useState("");
+  const [destination, setDestination] = useState("");
   const [openPanel, setOpenPanel] = useState(false);
   const [openVehicle, setOpenvehicle] = useState(false);
   const [confirmPanel, setConfirmPanel] = useState(false);
   const [driverFound, setDriverFound] = useState(false);
+  const [selectVehicle, setVehicle] = useState();
+  const [fare, setFare] = useState({});
+  const [query, setQuery] = useState("");
+  const [isPickup, setIsPickup] = useState(true);
+  const [ride, setRide] = useState(null);
   const panelRef = useRef();
   const buttonRef = useRef();
   const vehicleRef = useRef();
   const confirmRef = useRef();
   const driverFoundRef = useRef();
+
+  useEffect(() => {
+    sendMessage("join", { userType: "user", userId: user._id });
+  }, [user]);
+
+  useEffect(() => {
+    receiveMessage("rideConfirmed", (data) => {
+      console.log("rideConfirmed", data);
+      setRide(data);
+      setDriverFound(true);
+      setConfirmPanel(false);
+    });
+  }, [setRide, receiveMessage]);
+
+  receiveMessage("rideStarted", (data) => {
+    navigate("/riding", { state: { ride: data } });
+  });
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -74,22 +104,41 @@ function Home() {
     }
   }, [driverFound]);
 
+  const handleFindTrip = async () => {
+    setOpenPanel(false);
+
+    const response = await axios.get(
+      `${import.meta.env.VITE_BASE_URL}/ride/calFare`,
+      {
+        params: { pickup, destination },
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
+      }
+    );
+
+    if (response.data) {
+      console.log(response.data);
+      setFare(response.data);
+      setOpenvehicle(true);
+    }
+  };
+
   return (
     <div className="h-screen w-full flex flex-col relative">
       <img
-        className="w-[20%] absolute top-3 z-10 left-3"
+        className="w-[20%] absolute top-3 z-50 left-3"
         src="/img/uber.png"
         alt="uber"
       />
-      <div className="w-full h-screen overflow-hidden">
-        <img
-          className="w-full scale-150 h-full object-cover object-center"
-          src="https://lh3.googleusercontent.com/T1GrZUsdVEeZhUu9cCHivhEBh536MDTvFsJi_0ZDdjpBeRjt3YX-EmMqG4x_Ms4L2rBxKEUilGx5Lu_0c5i4rNDwvqzs9MJdTG6Cs1I=rw-e365-w2048"
-          alt="maps"
-        />
+      {/* Map Component */}
+      <div className="w-full h-screen absolute z-0">
+        <LiveTracking />
       </div>
-      <div className="w-full h-screen flex flex-col justify-end absolute">
-        <div className="w-full min-h-56 rounded-t-lg relative h-[30%] overflow-y-auto bg-white px-4 py-6 shadow">
+
+      {/* Panels */}
+      <div className="w-full h-screen flex flex-col justify-end absolute z-10">
+        <div className="w-full min-h-56 rounded-t-lg relative h-[39%] overflow-y-auto bg-white px-4 py-6 shadow">
           <span
             ref={buttonRef}
             onClick={() => {
@@ -106,10 +155,12 @@ function Home() {
               <input
                 onClick={() => {
                   setOpenPanel(true);
+                  setIsPickup(true);
                 }}
                 value={pickup}
                 onChange={(e) => {
                   setPickup(e.target.value);
+                  setQuery(e.target.value);
                 }}
                 type="text"
                 placeholder="Add a pick-up location"
@@ -122,15 +173,23 @@ function Home() {
                 value={destination}
                 onClick={() => {
                   setOpenPanel(true);
+                  setIsPickup(false);
                 }}
                 onChange={(e) => {
                   setDestination(e.target.value);
+                  setQuery(e.target.value);
                 }}
                 type="text"
                 placeholder="Enter your destination"
                 className="w-full p-3 border border-gray-300 rounded-lg text-sm placeholder-gray-500"
               />
             </div>
+            <button
+              onClick={handleFindTrip}
+              className="w-full text-white bg-black font-semibold py-2 mt-4 text-lg rounded-md"
+            >
+              Find Trip
+            </button>
             <div className="line h-12 w-2 border-l-2 border-dashed border-gray-700 absolute top-[26%] left-[2%] rounded-full"></div>
           </form>
         </div>
@@ -138,30 +197,52 @@ function Home() {
           <LocationList
             setOpenvehicle={setOpenvehicle}
             setOpenPanel={setOpenPanel}
+            setPickup={setPickup}
+            setDestination={setDestination}
+            query={query}
+            isPickup={isPickup}
           />
         </div>
       </div>
+
+      {/* Vehicle Selection */}
       <div
         ref={vehicleRef}
-        className="w-full z-10 fixed translate-y-full bottom-0"
+        className="w-full z-20 fixed translate-y-full bottom-0"
       >
         <VehicleSelection
           setOpenvehicle={setOpenvehicle}
           setOpenPanel={setOpenPanel}
           setConfirmPanel={setConfirmPanel}
+          fare={fare}
+          pickup={pickup}
+          destination={destination}
+          selectVehicle={selectVehicle}
+          setVehicle={setVehicle}
         />
       </div>
+
+      {/* Confirmed Vehicle */}
       <div
         ref={confirmRef}
-        className="w-full z-10 fixed translate-y-full bottom-0"
+        className="w-full z-20 fixed translate-y-full bottom-0"
       >
         <ConfirmedVehicle
+          fare={fare}
+          pickup={pickup}
+          destination={destination}
           setOpenvehicle={setOpenvehicle}
           setConfirmPanel={setConfirmPanel}
+          selectVehicle={selectVehicle}
         />
       </div>
-      <div className="w-full z-10 fixed translate-y-full bottom-0">
-        <DriverFound setDriverFound={setDriverFound} />
+
+      {/* Driver Found */}
+      <div
+        ref={driverFoundRef}
+        className="w-full z-30 fixed translate-y-full bottom-0"
+      >
+        <DriverFound ride={ride} setDriverFound={setDriverFound} />
       </div>
     </div>
   );

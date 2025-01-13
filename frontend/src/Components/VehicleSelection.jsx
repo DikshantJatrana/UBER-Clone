@@ -1,15 +1,39 @@
 import React, { useState } from "react";
 import { FaUserAlt } from "react-icons/fa";
 import { RiArrowDownWideFill } from "react-icons/ri";
+import axios from "axios";
 
 const VehicleSelection = ({
   setOpenvehicle,
   setOpenPanel,
   setConfirmPanel,
+  fare,
+  pickup,
+  destination,
+  selectVehicle,
+  setVehicle,
 }) => {
-  const [selectVehicle, setVehicle] = useState();
   const handleSelect = (value) => {
     setVehicle(value);
+  };
+  const CreateRide = async (selectVehicle, pickup, destination) => {
+    const response = await axios.post(
+      `${import.meta.env.VITE_BASE_URL}/ride/create`,
+      {
+        pickup,
+        destination,
+        vehicleType: selectVehicle,
+      },
+      {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
+      }
+    );
+    if (response.data) {
+      setConfirmPanel(true), setOpenvehicle(false);
+      console.log(response.data);
+    }
   };
 
   return (
@@ -49,7 +73,9 @@ const VehicleSelection = ({
             <h5 className="text-xs">2 min away</h5>
             <p className="text-xs text-gray-500">Affordable and comfy</p>
           </div>
-          <div className="text-xl flex items-start font-bold ">₹ 198.00</div>
+          <div className="text-xl flex items-start font-bold ">
+            ₹ {fare?.fares?.car}
+          </div>
         </div>
         <div
           onClick={() => {
@@ -74,7 +100,9 @@ const VehicleSelection = ({
             <h5 className="text-xs">2 min away</h5>
             <p className="text-xs text-gray-500">Comfy Auto Rides</p>
           </div>
-          <div className="text-xl flex items-start font-bold ">₹ 106.00</div>
+          <div className="text-xl flex items-start font-bold ">
+            ₹ {fare?.fares?.auto}
+          </div>
         </div>
         <div
           onClick={() => {
@@ -99,13 +127,19 @@ const VehicleSelection = ({
             <h5 className="text-xs">1 min away</h5>
             <p className="text-xs text-gray-500">Cheap Motobike Rides</p>
           </div>
-          <div className="text-xl flex items-start font-bold ">₹ 75.00</div>
+          <div className="text-xl flex items-start font-bold ">
+            ₹ {fare?.fares?.bike}
+          </div>
         </div>
       </div>
       <div className="mt-6">
         <button
           onClick={() => {
-            setConfirmPanel(true), setOpenvehicle(false);
+            if (!selectVehicle) {
+              alert("Please select a vehicle type.");
+              return;
+            }
+            CreateRide(selectVehicle, pickup, destination);
           }}
           className="w-full bg-black text-white py-3 rounded-lg text-sm font-medium"
         >
